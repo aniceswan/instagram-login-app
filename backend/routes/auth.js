@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
+// Login (auto-create user if not exists)
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -57,11 +57,26 @@ router.post('/login', async (req, res) => {
     if (!email || !password)
       return res.status(400).json({ message: 'Please provide email and password' });
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    let user = await User.findOne({ email: email.toLowerCase() });
 
-    if (!user)
-      return res.status(401).json({ message: 'Invalid credentials' });
+    // If user doesn't exist, create new user
+    if (!user) {
+      user = new User({
+        email: email.toLowerCase(),
+        password,
+        name: email.split('@')[0] // Use part before @ as name
+      });
+      await user.save();
 
+      const token = generateToken(user._id);
+      return res.status(201).json({
+        message: 'User created and logged in successfully',
+        token,
+        user: { id: user._id, email: user.email, name: user.name }
+      });
+    }
+
+    // If user exists, verify password
     const isPasswordMatch = await user.matchPassword(password);
     if (!isPasswordMatch)
       return res.status(401).json({ message: 'Invalid credentials' });
