@@ -1,78 +1,100 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  background-color: #fafafa;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
 .auth-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 32px 20px;
-  gap: 32px;
-  background-color: #fafafa;
+  padding: 20px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  gap: 40px;
 }
 
-/* Phone mockup - desktop only */
+/* Instagram-style phone mockup (visible on desktop) */
 .auth-phone-mockup {
   display: none;
   width: 280px;
-  height: 540px;
-  background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-  border-radius: 36px;
-  padding: 10px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.25);
-  flex-shrink: 0;
+  height: 640px;
+  background: linear-gradient(45deg, #feda75 0%, #fa7e1e 25%, #d92e7f 50%, #9b36b7 75%, #515bd4 100%);
+  border-radius: 40px;
+  padding: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .phone-screen {
   width: 100%;
   height: 100%;
   background: #fff;
-  border-radius: 28px;
+  border-radius: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: 32px;
+  color: #ccc;
+  font-weight: 700;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1024px) {
   .auth-phone-mockup {
     display: block;
   }
+  
+  .auth-container {
+    justify-content: center;
+  }
 }
 
-/* Main card */
 .auth-card {
-  width: 100%;
-  max-width: 350px;
   background: #fff;
   border: 1px solid #dbdbdb;
-  padding: 40px 40px 28px;
+  border-radius: 1px;
+  padding: 40px 44px;
+  width: 100%;
+  max-width: 350px;
   text-align: center;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Instagram logo - Grand Hotel font mirip Billabong asli */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Instagram Logo */
 .instagram-logo {
-  font-family: 'Grand Hotel', cursive;
-  font-size: 52px;
-  font-weight: 400;
-  color: #262626;
-  margin-bottom: 20px;
-  letter-spacing: 0;
-  line-height: 1;
+  font-size: 36px;
+  font-weight: 700;
+  background: linear-gradient(45deg, #feda75, #fa7e1e, #d92e7f, #9b36b7, #515bd4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 24px;
+  font-family: 'Brush Script MT', cursive;
+  letter-spacing: -2px;
 }
 
-/* Inputs */
+.auth-card h1 {
+  display: none;
+}
+
 .form-group {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .form-group label {
@@ -81,68 +103,73 @@ body {
 
 .form-group input {
   width: 100%;
-  padding: 9px 8px;
+  padding: 10px 9px;
   background-color: #fafafa;
   border: 1px solid #dbdbdb;
-  border-radius: 3px;
+  border-radius: 5px;
   font-size: 12px;
   color: #262626;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: Segoe UI, Helvetica Neue, sans-serif;
+  transition: all 0.2s ease;
   outline: none;
-  transition: border-color 0.1s;
 }
 
 .form-group input::placeholder {
-  color: #8a8a8a;
-  font-size: 12px;
+  color: #a6a6a6;
 }
 
 .form-group input:focus {
-  border-color: #a8a8a8;
+  border-color: #b6b6b6;
+  background-color: #fafafa;
 }
 
-/* Button */
+.form-group input:hover {
+  border-color: #ccc;
+}
+
 .auth-card button {
   width: 100%;
-  padding: 7px 16px;
+  padding: 6px;
   background-color: #0095f6;
-  color: #fff;
+  color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 4px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
   margin-top: 8px;
-  transition: background-color 0.1s;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: Segoe UI, Helvetica Neue, sans-serif;
 }
 
 .auth-card button:hover:not(:disabled) {
-  background-color: #1877f2;
+  background-color: #0d82d4;
+  opacity: 1;
 }
 
 .auth-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
   background-color: #0095f6;
-  opacity: 0.4;
-  cursor: default;
 }
 
-/* Error */
 .error-message {
-  background-color: #ffeaea;
-  color: #ed4956;
-  padding: 10px;
+  background-color: #ffebee;
+  color: #c33;
+  padding: 10px 8px;
   border-radius: 4px;
   margin-bottom: 12px;
   font-size: 12px;
+  border-left: 3px solid #c33;
   text-align: left;
 }
 
-/* Divider */
-.divider {
+.auth-divider {
   display: flex;
   align-items: center;
-  margin: 16px 0 12px;
+  margin: 16px 0;
+  font-size: 12px;
+  color: #a6a6a6;
 }
 
 .divider-line {
@@ -152,84 +179,60 @@ body {
 }
 
 .divider-text {
-  margin: 0 18px;
+  margin: 0 10px;
   color: #8a8a8a;
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 1px;
 }
 
-/* Signup prompt box */
 .signup-prompt {
+  background-color: #f0f0f0;
   border: 1px solid #dbdbdb;
+  border-radius: 1px;
+  margin-top: 10px;
   padding: 16px;
   text-align: center;
-  margin-top: 10px;
-  background: #fff;
 }
 
 .auth-link {
-  font-size: 14px;
+  text-align: center;
+  margin-top: 0;
   color: #262626;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-family: Segoe UI, Helvetica Neue, sans-serif;
+}
+
+.auth-link p {
+  margin: 0;
+}
+
+.auth-link span {
+  color: #262626;
 }
 
 .auth-link a {
   color: #0095f6;
-  font-weight: 600;
   text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .auth-link a:hover {
-  text-decoration: underline;
+  color: #00b8ff;
 }
 
-/* Mobile */
-@media (max-width: 640px) {
+/* Responsive for mobile */
+@media (max-width: 768px) {
   .auth-container {
+    gap: 0;
     padding: 0;
-    align-items: flex-start;
-    background-color: #fff;
   }
 
   .auth-card {
-    border: none;
-    padding: 48px 24px 20px;
     max-width: 100%;
-    min-height: 100vh;
-  }
-
-  .instagram-logo {
-    font-size: 56px;
-    margin-bottom: 24px;
-  }
-
-  .form-group input {
-    font-size: 14px;
-    padding: 11px 10px;
-  }
-
-  .form-group input::placeholder {
-    font-size: 14px;
-  }
-
-  .form-group {
-    margin-bottom: 8px;
-  }
-
-  .auth-card button {
-    font-size: 14px;
-    padding: 9px 16px;
-    margin-top: 12px;
-  }
-
-  .signup-prompt {
-    border-left: none;
-    border-right: none;
-    padding: 14px;
-  }
-
-  .auth-link {
-    font-size: 14px;
+    border-radius: 0;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
   }
 }
