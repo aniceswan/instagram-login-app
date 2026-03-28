@@ -9,15 +9,12 @@ import adminRoutes from './routes/admin.js';
 import protectedRoutes from './routes/protected.js';
 import errorHandler from './middleware/errorHandler.js';
 
-// Fix path untuk load .env dari root folder
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const envPath = path.resolve(__dirname, '..', '.env');
-console.log('🔍 Loading .env from:', envPath);
-
-dotenv.config({ path: envPath });
-
-console.log('📝 Env check: MONGODB_URI =', process.env.MONGODB_URI ? '✓ SET' : '✗ NOT SET');
+// Load .env only in local development; Vercel provides env vars from the dashboard
+if (process.env.NODE_ENV !== 'production') {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+}
 
 const app = express();
 
@@ -54,7 +51,13 @@ app.get('/api/health', (req, res) => {
 // Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export for Vercel serverless
+export default app;
+
+// Start server only in local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
