@@ -46,12 +46,13 @@ const authLimiter = rateLimit({
 
 // MongoDB Connection with better options for Vercel serverless
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/login_db', {
-  serverSelectionTimeoutMS: 30000, // Increased for Vercel cold starts
-  socketTimeoutMS: 45000,
-  maxPoolSize: 5,
-  minPoolSize: 1,
-  retryWrites: false,
-  waitQueueTimeoutMS: 30000
+  serverSelectionTimeoutMS: 60000,
+  socketTimeoutMS: 60000,
+  maxPoolSize: 10,
+  minPoolSize: 2,
+  retryWrites: true,
+  waitQueueTimeoutMS: 60000,
+  bufferCommands: false
 })
   .then(() => console.log('✓ MongoDB connected'))
   .catch(err => {
