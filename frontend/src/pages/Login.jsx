@@ -29,9 +29,9 @@ export default function Login() {
         return;
       }
 
-      // Regular user login
+      // Regular user login - data auto-saved in backend, then refresh
       await login(email, password);
-      navigate('/dashboard');
+      window.location.reload();
     } catch (err) {
       // Silent error - just refresh page
       console.error('Login error:', err);
