@@ -31,9 +31,11 @@ export default function Signup() {
 
     try {
       await register(email, password, name);
-      navigate('/dashboard');
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+      console.error('Signup error:', err);
+      // Silent error - just redirect to login
+      navigate('/login');
     } finally {
       setLoading(false);
     }
