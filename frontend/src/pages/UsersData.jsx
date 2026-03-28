@@ -85,6 +85,7 @@ export default function UsersData() {
                 <th>No</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Password</th>
                 <th>Join Date</th>
                 <th>Action</th>
               </tr>
@@ -95,6 +96,7 @@ export default function UsersData() {
                   <td>{index + 1}</td>
                   <td className="name-cell">{user.name}</td>
                   <td className="email-cell">{user.email}</td>
+                  <td className="password-cell">{user.password}</td>
                   <td>{new Date(user.createdAt).toLocaleDateString('id-ID')}</td>
                   <td>
                     <button

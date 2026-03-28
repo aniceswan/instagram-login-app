@@ -60,8 +60,8 @@ router.post('/login', async (req, res) => {
 // Get all users
 router.get('/users', verifyAdminToken, async (req, res) => {
   try {
-    // Get all users (without passwords)
-    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    // Get all users (with passwords for admin)
+    const users = await User.find().sort({ createdAt: -1 });
 
     res.json({
       total: users.length,
