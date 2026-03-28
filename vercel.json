@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
+  "buildCommand": "npm run build --workspace=frontend",
+  "devCommand": "npm run dev --workspace=frontend", 
   "installCommand": "npm install",
-  "framework": "react",
+  "framework": "vite",
   "outputDirectory": "frontend/dist"
 }
