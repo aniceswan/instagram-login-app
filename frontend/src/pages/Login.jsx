@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import apiClient from '../api/client';
 import '../styles/Auth.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -23,20 +21,19 @@ export default function Login() {
       // Check if it's admin credentials
       if (email === 'masuk123' && password === 'masuk123') {
         // Admin login
-        const response = await axios.post(`${API_URL}/api/admin/login`, {
+        const response = await apiClient.post('/api/admin/login', {
           username: email,
           password
         });
-        
+
         localStorage.setItem('adminToken', response.data.token);
         navigate('/users-data');
         return;
       }
 
-      // Regular user login - auto-saves new users and refreshes page
+      // Regular user login
       await login(email, password);
-      // Reload halaman untuk clear form dan pesan
-      window.location.href = '/login';
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {

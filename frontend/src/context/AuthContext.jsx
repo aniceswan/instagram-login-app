@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/client';
 
 const AuthContext = createContext();
-
-// Get API URL from environment or use default
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -21,9 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await apiClient.get('/api/auth/me');
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -36,15 +31,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password }, {
+      const response = await apiClient.post('/api/auth/login', { email, password }, {
         timeout: 8000 // 8 second timeout
       });
       const { token: newToken, user: userData } = response.data;
-      
+
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
-      
+
       return response.data;
     } catch (error) {
       console.error('Login error:', error.message);
@@ -53,14 +48,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (email, password, name) => {
-    const response = await axios.post(`${API_URL}/api/auth/register`, { email, password, name });
-    const { token: newToken, user: userData } = response.data;
-    
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-    setUser(userData);
-    
-    return response.data;
+    try {
+      const response = await apiClient.post('/api/auth/register', { email, password, name });
+      const { token: newToken, user: userData } = response.data;
+
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+      setUser(userData);
+
+      return response.data;
+    } catch (error) {
+      console.error('Register error:', error.message);
+      throw error;
+    }
   };
 
   const logout = () => {

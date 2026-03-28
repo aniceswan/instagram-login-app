@@ -8,8 +8,28 @@ const router = express.Router();
 const ADMIN_USERNAME = 'masuk123';
 const ADMIN_PASSWORD = 'masuk123';
 
-// Get JWT secret with fallback
-const JWT_SECRET = process.env.JWT_SECRET || 'kh2xpql9mnvb24xwqzp1tyuiop0asdfghj123456';
+// JWT_SECRET must be set in environment — no fallback to prevent accidental insecure deployment
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set');
+}
+
+// Middleware to verify admin token
+function verifyAdminToken(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized as admin' });
+    }
+    next();
+  } catch {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+}
 
 // Admin login
 router.post('/login', async (req, res) => {
@@ -33,28 +53,13 @@ router.post('/login', async (req, res) => {
       admin: { id: 'admin', role: 'admin', username: 'Admin' }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Login failed' });
   }
 });
 
 // Get all users
-router.get('/users', async (req, res) => {
+router.get('/users', verifyAdminToken, async (req, res) => {
   try {
-    // Verify admin token
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      if (decoded.role !== 'admin') {
-        return res.status(403).json({ message: 'Not authorized as admin' });
-      }
-    } catch (error) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
     // Get all users (without passwords)
     const users = await User.find().select('-password').sort({ createdAt: -1 });
 
@@ -63,27 +68,13 @@ router.get('/users', async (req, res) => {
       users: users
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Failed to fetch users' });
   }
 });
 
 // Get user by ID
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', verifyAdminToken, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      if (decoded.role !== 'admin') {
-        return res.status(403).json({ message: 'Not authorized' });
-      }
-    } catch (error) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -91,31 +82,20 @@ router.get('/users/:id', async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Failed to fetch user' });
   }
 });
 
 // Delete user
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', verifyAdminToken, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
+    const deleted = await User.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'User not found' });
     }
-
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      if (decoded.role !== 'admin') {
-        return res.status(403).json({ message: 'Not authorized' });
-      }
-    } catch (error) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
-    await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Delete failed' });
   }
 });
 

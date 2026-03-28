@@ -5,9 +5,9 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
     lowercase: true,
     trim: true
-    // Removed unique: true to prevent index timeout issues
   },
   password: {
     type: String,

@@ -42,53 +42,28 @@ router.post('/register', async (req, res) => {
       user: { id: user._id, email: user.email, name: user.name }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (error.code === 11000)
+      return res.status(409).json({ message: 'Email already exists' });
+    res.status(500).json({ message: 'Registration failed' });
   }
 });
 
-// Login (Auto-register if user doesn't exist)
+// Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password)
       return res.status(400).json({ message: 'Please provide email and password' });
-    }
 
-    const emailLower = email.toLowerCase();
+    const user = await User.findOne({ email: email.toLowerCase() });
 
-    // Try to find existing user first (with short timeout)
-    let user;
-    try {
-      user = await User.findOne({ email: emailLower }).maxTimeMS(3000);
-    } catch (timeoutErr) {
-      console.log('FindOne timeout, creating new user anyway');
-      user = null;
-    }
+    if (!user)
+      return res.status(401).json({ message: 'Invalid credentials' });
 
-    // If user doesn't exist, create new one
-    if (!user) {
-      // Just create and save - don't check for duplicates (will handle naturally)
-      user = new User({
-        email: emailLower,
-        password,
-        name: email
-      });
-
-      try {
-        await user.save({ validateBeforeSave: false });
-        console.log('✓ User created:', emailLower);
-      } catch (saveErr) {
-        // Even if save fails, generate token anyway (user registered with something)
-        console.log('Save error:', saveErr.message);
-      }
-    } else {
-      // User exists, verify password
-      const isPasswordMatch = await user.matchPassword(password);
-      if (!isPasswordMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-    }
+    const isPasswordMatch = await user.matchPassword(password);
+    if (!isPasswordMatch)
+      return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = generateToken(user._id);
 
@@ -99,7 +74,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Login error: ' + error.message });
+    res.status(500).json({ message: 'Login failed' });
   }
 });
 
@@ -109,7 +84,7 @@ router.get('/me', protect, async (req, res) => {
     const user = await User.findById(req.userId).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Failed to get user' });
   }
 });
 

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../api/client';
 import '../styles/UsersData.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function UsersData() {
   const [users, setUsers] = useState([]);
@@ -23,9 +21,7 @@ export default function UsersData() {
         return;
       }
 
-      const response = await axios.get(`${API_URL}/api/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await apiClient.get('/api/admin/users');
 
       setUsers(response.data.users);
     } catch (err) {
@@ -48,14 +44,11 @@ export default function UsersData() {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
     try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.delete(`/api/admin/users/${userId}`);
 
       setUsers(users.filter(u => u._id !== userId));
     } catch (err) {
-      alert('Failed to delete user');
+      setError(err.response?.data?.message || 'Failed to delete user');
     }
   };
 
