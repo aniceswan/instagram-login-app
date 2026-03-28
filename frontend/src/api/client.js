@@ -17,11 +17,13 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor: on 401, clear storage and redirect to login
+// Response interceptor: on 401 for protected routes, clear storage and redirect to login
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || '';
+    const isLoginRoute = url.includes('/api/auth/login') || url.includes('/api/admin/login');
+    if (error.response?.status === 401 && !isLoginRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('adminToken');
       window.location.href = '/login';
