@@ -44,16 +44,20 @@ const authLimiter = rateLimit({
   message: { message: 'Too many requests, please try again later.' }
 });
 
-// MongoDB Connection with better options
+// MongoDB Connection with better options for Vercel serverless
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/login_db', {
-  serverSelectionTimeoutMS: 5000,
+  serverSelectionTimeoutMS: 30000, // Increased for Vercel cold starts
   socketTimeoutMS: 45000,
-  maxPoolSize: 10,
-  minPoolSize: 2,
-  retryWrites: false // Disable for timeout issues
+  maxPoolSize: 5,
+  minPoolSize: 1,
+  retryWrites: false,
+  waitQueueTimeoutMS: 30000
 })
   .then(() => console.log('✓ MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+    // Don't crash - serverless functions can retry
+  });
 
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
