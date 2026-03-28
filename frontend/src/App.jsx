@@ -24,7 +24,7 @@ export default function App() {
             }
           />
           <Route path="/users-data" element={<UsersData />} />
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<Navigate to="/signup" />} />
         </Routes>
       </AuthProvider>
     </Router>

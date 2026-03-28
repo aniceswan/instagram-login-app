@@ -6,6 +6,8 @@ import '../styles/Auth.css';
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -15,6 +17,11 @@ export default function Signup() {
     e.preventDefault();
     setError('');
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
@@ -23,7 +30,7 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      await register(email, password, email);
+      await register(email, password, name);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed. Please try again.');
@@ -54,7 +61,17 @@ export default function Signup() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email or username"
+              placeholder="Email address"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full name"
               required
             />
           </div>
@@ -64,7 +81,17 @@ export default function Signup() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder="New password"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm password"
               required
             />
           </div>
