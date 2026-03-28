@@ -68,7 +68,8 @@ router.get('/users', verifyAdminToken, async (req, res) => {
       users: users
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch users' });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Failed to fetch users', error: error.message });
   }
 });
 
