@@ -7,14 +7,12 @@ import '../styles/Auth.css';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -35,7 +33,9 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      // Silent error - just refresh page
+      console.error('Login error:', err);
+      window.location.reload();
     } finally {
       setLoading(false);
     }
@@ -50,8 +50,6 @@ export default function Login() {
 
       <div className="auth-card">
         <div className="instagram-logo">Instagram</div>
-        
-        {error && <div className="error-message">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
