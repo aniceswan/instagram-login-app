@@ -65,14 +65,27 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/protected', protectedRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  const uri = process.env.MONGODB_URI || '';
-  const maskedUri = uri.replace(/:([^@]+)@/, ':***@');
+app.get('/api/health', async (req, res) => {
+  const uri = process.env.MONGODB_URI || 'NOT SET';
+  const hasUri = uri !== 'NOT SET';
+  const startsCorrectly = uri.startsWith('mongodb+srv://');
+
+  let testResult = null;
+  if (hasUri && mongoose.connection.readyState === 0) {
+    try {
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+      testResult = 'reconnect success';
+    } catch (err) {
+      testResult = err.message;
+    }
+  }
+
   res.json({
     status: 'OK',
     dbState: mongoose.connection.readyState,
-    // 0=disconnected, 1=connected, 2=connecting, 3=disconnecting
-    mongoUri: maskedUri
+    uriSet: hasUri,
+    uriFormat: startsCorrectly ? 'OK' : 'WRONG FORMAT',
+    testResult
   });
 });
 
