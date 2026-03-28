@@ -66,7 +66,14 @@ app.use('/api/protected', protectedRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK' });
+  const uri = process.env.MONGODB_URI || '';
+  const maskedUri = uri.replace(/:([^@]+)@/, ':***@');
+  res.json({
+    status: 'OK',
+    dbState: mongoose.connection.readyState,
+    // 0=disconnected, 1=connected, 2=connecting, 3=disconnecting
+    mongoUri: maskedUri
+  });
 });
 
 // Error handler
