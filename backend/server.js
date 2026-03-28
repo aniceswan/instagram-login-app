@@ -51,8 +51,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/login_db'
   maxPoolSize: 10,
   minPoolSize: 2,
   retryWrites: true,
-  waitQueueTimeoutMS: 60000,
-  bufferCommands: false
+  waitQueueTimeoutMS: 60000
 })
   .then(() => console.log('✓ MongoDB connected'))
   .catch(err => {
