@@ -42,9 +42,10 @@ router.post('/register', async (req, res) => {
       user: { id: user._id, email: user.email, name: user.name }
     });
   } catch (error) {
+    console.error('Register error:', error);
     if (error.code === 11000)
       return res.status(409).json({ message: 'Email already exists' });
-    res.status(500).json({ message: 'Registration failed' });
+    res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 });
 
@@ -74,7 +75,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Login failed' });
+    res.status(500).json({ message: 'Login failed', error: error.message });
   }
 });
 
@@ -84,7 +85,8 @@ router.get('/me', protect, async (req, res) => {
     const user = await User.findById(req.userId).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to get user' });
+    console.error('Get user error:', error);
+    res.status(500).json({ message: 'Failed to get user', error: error.message });
   }
 });
 
